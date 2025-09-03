@@ -120,12 +120,10 @@ export const useOrders = () => {
 
             console.log("📥 Snapshot reçu:", snapshot.size, "documents"); // Debug
             console.log("📋 Commandes récupérées:", ordersData); // Debug
-            console.log("📊 Avant setOrders - orders actuel:", orders); // Debug
 
             setOrders(ordersData);
 
             console.log("📊 Après setOrders - ordersData défini:", ordersData); // Debug
-            console.log("📊 Après setOrders - orders state:", orders); // Debug
 
             setLoading(false);
             setError(null);
@@ -144,8 +142,8 @@ export const useOrders = () => {
         setLoading(false);
       }
     },
-    [orders]
-  ); // Dépendance sur orders pour la stabilité
+    [] // Dépendances vides pour éviter la boucle infinie
+  );
 
   // Charger les commandes pour une période donnée - STABILISÉ avec useCallback
   const loadOrdersForPeriod = useCallback(
