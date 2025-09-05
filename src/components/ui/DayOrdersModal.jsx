@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import OrderCard from "./OrderCard";
+import BasketOrdersModal from "./BasketOrdersModal";
 import { useOrders } from "../../hooks/useOrders";
 import {
   calculateBasketsSummary,
@@ -14,6 +15,8 @@ const DayOrdersModal = ({
   onOrderClick,
 }) => {
   const { updateOrder } = useOrders();
+  const [selectedBasketType, setSelectedBasketType] = useState(null);
+  const [isBasketModalOpen, setIsBasketModalOpen] = useState(false);
 
   const handleStatusChange = async (order, newStatus) => {
     try {
@@ -31,6 +34,26 @@ const DayOrdersModal = ({
 
   // Calculer le résumé des paniers pour les commandes actives du jour
   const basketsSummary = calculateBasketsSummary(dayOrders);
+
+  // Gestionnaire pour cliquer sur une carte de paniers
+  const handleBasketClick = (oysterType) => {
+    // Filtrer les commandes du type sélectionné
+    const filteredOrders = dayOrders.filter(
+      (order) =>
+        order.oysterType === oysterType &&
+        order.status === "active" &&
+        order.quantity > 0
+    );
+
+    setSelectedBasketType({ type: oysterType, orders: filteredOrders });
+    setIsBasketModalOpen(true);
+  };
+
+  // Fermer la modale des paniers
+  const closeBasketModal = () => {
+    setIsBasketModalOpen(false);
+    setSelectedBasketType(null);
+  };
 
   const formatDate = (dateString) => {
     if (!dateString) return "Date inconnue";
@@ -76,50 +99,19 @@ const DayOrdersModal = ({
             </div>
           ) : (
             <div className="space-y-4">
-              {/* Statistiques du jour */}
-              <div className="bg-blue-50 rounded-lg p-4 mb-6">
-                <div className="flex items-center justify-between">
-                  <span className="text-blue-800 font-medium">
-                    Total du jour
-                  </span>
-                  <span className="text-2xl font-bold text-blue-600">
-                    {dayOrders.length}
-                  </span>
-                </div>
-                <div className="grid grid-cols-3 gap-2 mt-3 text-sm">
-                  <div className="text-center">
-                    <div className="font-semibold text-blue-600">
-                      {dayOrders.filter((o) => o.status === "active").length}
-                    </div>
-                    <div className="text-blue-500">Active</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="font-semibold text-green-600">
-                      {dayOrders.filter((o) => o.status === "recue").length}
-                    </div>
-                    <div className="text-green-500">Récupérée</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="font-semibold text-red-600">
-                      {dayOrders.filter((o) => o.status === "annulee").length}
-                    </div>
-                    <div className="text-red-500">Annulée</div>
-                  </div>
-                </div>
-              </div>
-
               {/* Résumé des paniers à préparer */}
               {basketsSummary.length > 0 && (
-                <div className="bg-amber-50 rounded-lg p-4 mb-6">
-                  <h4 className="text-amber-800 font-medium mb-3 flex items-center">
-                    <span className="text-amber-600 mr-2">🛒</span>
+                <div className="bg-white rounded-lg shadow-sm p-4 lg:p-6 mb-6">
+                  <h3 className="text-base lg:text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <span className="text-amber-500 mr-2">🛒</span>
                     Paniers à préparer
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {basketsSummary.map((item) => (
-                      <div
+                      <button
                         key={item.type}
-                        className="bg-white border border-amber-200 rounded-lg p-3"
+                        onClick={() => handleBasketClick(item.type)}
+                        className="bg-amber-50 border border-amber-200 rounded-lg p-3 cursor-pointer hover:bg-amber-100 hover:border-amber-300 transition-colors w-full text-left"
                       >
                         <div className="flex items-center justify-between">
                           <div>
@@ -139,28 +131,51 @@ const DayOrdersModal = ({
                             </p>
                           </div>
                         </div>
-                      </div>
+                      </button>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Liste des commandes */}
-              <div className="space-y-3 pb-12">
-                {dayOrders.map((order) => (
-                  <OrderCard
-                    key={order.id}
-                    order={order}
-                    onOrderClick={onOrderClick}
-                    onStatusChange={handleStatusChange}
-                    showStatusToggle={true}
-                  />
-                ))}
+              {/* Liste des commandes actives */}
+              <div className="bg-white rounded-lg shadow-sm p-4 lg:p-6">
+                <h3 className="text-base lg:text-lg font-semibold text-gray-900 mb-4">
+                  Commandes actives
+                </h3>
+                <div className="space-y-3">
+                  {dayOrders
+                    .filter((order) => order.status === "active")
+                    .map((order) => (
+                      <OrderCard
+                        key={order.id}
+                        order={order}
+                        onOrderClick={onOrderClick}
+                        onStatusChange={handleStatusChange}
+                        showStatusToggle={true}
+                      />
+                    ))}
+                  {dayOrders.filter((order) => order.status === "active")
+                    .length === 0 && (
+                    <p className="text-gray-500 text-center py-4">
+                      Aucune commande active pour ce jour
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           )}
         </div>
       </div>
+
+      {/* Modale des commandes par type d'huîtres */}
+      <BasketOrdersModal
+        isOpen={isBasketModalOpen}
+        onClose={closeBasketModal}
+        orders={selectedBasketType?.orders || []}
+        oysterType={selectedBasketType?.type}
+        selectedDate={selectedDate}
+        onOrderClick={onOrderClick}
+      />
     </div>
   );
 };

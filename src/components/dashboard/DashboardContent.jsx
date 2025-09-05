@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import OrderCard from "../ui/OrderCard";
+import BasketOrdersModal from "../ui/BasketOrdersModal";
 import { useOrders } from "../../hooks/useOrders";
 import {
   calculateBasketsSummary,
@@ -8,6 +9,8 @@ import {
 
 const DashboardContent = ({ orders = [], onOrderClick }) => {
   const { updateOrder } = useOrders();
+  const [selectedBasketType, setSelectedBasketType] = useState(null);
+  const [isBasketModalOpen, setIsBasketModalOpen] = useState(false);
 
   const handleStatusChange = async (order, newStatus) => {
     try {
@@ -62,13 +65,43 @@ const DashboardContent = ({ orders = [], onOrderClick }) => {
   const basketsSummary = React.useMemo(() => {
     const today = new Date();
     const todayString = today.toISOString().split("T")[0];
+
     const todayOrders = orders.filter((order) => {
       const orderDate = new Date(order.pickupDate);
       const orderDateString = orderDate.toISOString().split("T")[0];
       return orderDateString === todayString;
     });
+
     return calculateBasketsSummary(todayOrders);
   }, [orders]);
+
+  // Gestionnaire pour cliquer sur une carte de paniers
+  const handleBasketClick = (oysterType) => {
+    const today = new Date();
+    const todayString = today.toISOString().split("T")[0];
+    const todayOrders = orders.filter((order) => {
+      const orderDate = new Date(order.pickupDate);
+      const orderDateString = orderDate.toISOString().split("T")[0];
+      return orderDateString === todayString;
+    });
+
+    // Filtrer les commandes du type sélectionné
+    const filteredOrders = todayOrders.filter(
+      (order) =>
+        order.oysterType === oysterType &&
+        order.status === "active" &&
+        order.quantity > 0
+    );
+
+    setSelectedBasketType({ type: oysterType, orders: filteredOrders });
+    setIsBasketModalOpen(true);
+  };
+
+  // Fermer la modale des paniers
+  const closeBasketModal = () => {
+    setIsBasketModalOpen(false);
+    setSelectedBasketType(null);
+  };
 
   return (
     <div className="space-y-4 lg:space-y-6">
@@ -206,9 +239,10 @@ const DashboardContent = ({ orders = [], onOrderClick }) => {
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {basketsSummary.map((item) => (
-              <div
+              <button
                 key={item.type}
-                className="bg-amber-50 border border-amber-200 rounded-lg p-3"
+                onClick={() => handleBasketClick(item.type)}
+                className="bg-amber-50 border border-amber-200 rounded-lg p-3 cursor-pointer hover:bg-amber-100 hover:border-amber-300 transition-colors w-full text-left"
               >
                 <div className="flex items-center justify-between">
                   <div>
@@ -228,7 +262,7 @@ const DashboardContent = ({ orders = [], onOrderClick }) => {
                     </p>
                   </div>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </div>
@@ -275,6 +309,16 @@ const DashboardContent = ({ orders = [], onOrderClick }) => {
           );
         })()}
       </div>
+
+      {/* Modale des commandes par type d'huîtres */}
+      <BasketOrdersModal
+        isOpen={isBasketModalOpen}
+        onClose={closeBasketModal}
+        orders={selectedBasketType?.orders || []}
+        oysterType={selectedBasketType?.type}
+        selectedDate={new Date().toISOString().split("T")[0]}
+        onOrderClick={onOrderClick}
+      />
     </div>
   );
 };
