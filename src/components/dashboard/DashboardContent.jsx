@@ -187,7 +187,7 @@ const DashboardContent = ({ orders = [], onOrderClick }) => {
           Commandes du jour
         </h3>
         <label className="text-sm font-medium text-gray-700">
-          Cliquez sur "Active" pour passer une commande en "Livré"
+          Cliquer sur "Active" pour passer en "Livré"
         </label>
 
         {(() => {
