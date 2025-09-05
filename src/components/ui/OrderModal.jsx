@@ -426,7 +426,7 @@ const OrderModal = ({ order, isOpen, onClose }) => {
                   Statut
                 </span>
                 <span
-                  className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
+                  className={`inline-flex ml-3 px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
                     order.status
                   )}`}
                 >
