@@ -226,27 +226,40 @@ const OrderForm = () => {
                   Quantité (en douzaines) *
                 </label>
                 <div className="relative">
-                  <input
-                    type="number"
-                    inputMode="decimal"
+                  <select
                     value={formData.quantity}
                     onChange={(e) =>
                       handleFormChange("quantity", e.target.value)
                     }
                     className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm"
-                    min="0.5"
-                    step="0.5"
-                    placeholder="1.5"
                     required
-                  />
+                  >
+                    <option value="0.5">1/2</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                    <option value="13">13</option>
+                    <option value="14">14</option>
+                    <option value="15">15</option>
+                    <option value="16">16</option>
+                    <option value="17">17</option>
+                    <option value="18">18</option>
+                    <option value="19">19</option>
+                    <option value="20">20</option>
+                  </select>
                   <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm font-medium">
                     dz
                   </span>
                 </div>
-                <p className="text-xs text-gray-500 mt-2">
-                  Minimum : 1/2 douzaine (0.5). Exemple : 1.5 = 1 douzaine et
-                  demie
-                </p>
               </div>
             </div>
           </div>
