@@ -186,6 +186,7 @@ const DashboardContent = ({ orders = [], onOrderClick }) => {
         <h3 className="text-base lg:text-lg font-semibold text-gray-900 mb-4">
           Commandes du jour
         </h3>
+        <p>Cliquez sur "Active" pour passer une commande en "Livré"</p>
 
         {(() => {
           const today = new Date();
