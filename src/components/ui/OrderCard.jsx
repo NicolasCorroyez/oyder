@@ -4,6 +4,7 @@ import {
   originLabels,
   locationLabels,
   statusLabels,
+  calculateBaskets,
 } from "../../utils/constants";
 
 const OrderCard = ({
@@ -70,6 +71,12 @@ const OrderCard = ({
             <div className="flex items-center space-x-2 text-gray-600 text-xs">
               <div className="bg-purple-100 text-purple-700 px-2 py-1 rounded border border-purple-200 font-medium">
                 {order.quantity}dz
+              </div>
+              <div className="bg-amber-100 text-amber-700 px-2 py-1 rounded border border-amber-200 font-medium">
+                {calculateBaskets(order.oysterType, order.quantity)} panier
+                {calculateBaskets(order.oysterType, order.quantity) > 1
+                  ? "s"
+                  : ""}
               </div>
               <div className="bg-orange-100 text-orange-700 px-2 py-1 rounded border border-orange-200 font-medium">
                 {oysterTypeLabels[order.oysterType]?.includes("Numéro")

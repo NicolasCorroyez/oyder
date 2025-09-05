@@ -9,6 +9,7 @@ import {
   statusLabels,
   oysterTypeLabels,
   originLabels,
+  calculateBaskets,
 } from "../../utils/constants";
 
 const OrderModal = ({ order, isOpen, onClose }) => {
@@ -335,13 +336,24 @@ const OrderModal = ({ order, isOpen, onClose }) => {
                     </p>
                   </div>
                 ) : (
-                  <p className="text-gray-900">
-                    {order.quantity
-                      ? `${order.quantity} douzaine${
-                          order.quantity > 1 ? "s" : ""
-                        }`
-                      : "Non spécifiée"}
-                  </p>
+                  <div>
+                    <p className="text-gray-900">
+                      {order.quantity
+                        ? `${order.quantity} douzaine${
+                            order.quantity > 1 ? "s" : ""
+                          }`
+                        : "Non spécifiée"}
+                    </p>
+                    {order.quantity && (
+                      <p className="text-sm text-amber-600 font-medium mt-1">
+                        = {calculateBaskets(order.oysterType, order.quantity)}{" "}
+                        panier
+                        {calculateBaskets(order.oysterType, order.quantity) > 1
+                          ? "s"
+                          : ""}
+                      </p>
+                    )}
+                  </div>
                 )}
               </div>
               <div>

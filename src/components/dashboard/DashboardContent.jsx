@@ -1,6 +1,10 @@
 import React from "react";
 import OrderCard from "../ui/OrderCard";
 import { useOrders } from "../../hooks/useOrders";
+import {
+  calculateBasketsSummary,
+  oysterTypeLabels,
+} from "../../utils/constants";
 
 const DashboardContent = ({ orders = [], onOrderClick }) => {
   const { updateOrder } = useOrders();
@@ -52,6 +56,18 @@ const DashboardContent = ({ orders = [], onOrderClick }) => {
     });
 
     return stats;
+  }, [orders]);
+
+  // Calculer le résumé des paniers pour les commandes actives du jour
+  const basketsSummary = React.useMemo(() => {
+    const today = new Date();
+    const todayString = today.toISOString().split("T")[0];
+    const todayOrders = orders.filter((order) => {
+      const orderDate = new Date(order.pickupDate);
+      const orderDateString = orderDate.toISOString().split("T")[0];
+      return orderDateString === todayString;
+    });
+    return calculateBasketsSummary(todayOrders);
   }, [orders]);
 
   return (
@@ -180,6 +196,43 @@ const DashboardContent = ({ orders = [], onOrderClick }) => {
           </div>
         </div>
       </div>
+
+      {/* Résumé des paniers à préparer */}
+      {basketsSummary.length > 0 && (
+        <div className="bg-white rounded-lg shadow-sm p-4 lg:p-6">
+          <h3 className="text-base lg:text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <span className="text-amber-500 mr-2">🛒</span>
+            Paniers à préparer aujourd'hui
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {basketsSummary.map((item) => (
+              <div
+                key={item.type}
+                className="bg-amber-50 border border-amber-200 rounded-lg p-3"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-amber-800">
+                      {oysterTypeLabels[item.type] || item.type}
+                    </p>
+                    <p className="text-xs text-amber-600">
+                      {item.orders} commande{item.orders > 1 ? "s" : ""}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-lg font-bold text-amber-700">
+                      {item.baskets}
+                    </p>
+                    <p className="text-xs text-amber-600">
+                      panier{item.baskets > 1 ? "s" : ""}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Dernières commandes */}
       <div className="bg-white rounded-lg shadow-sm p-4 lg:p-6">
