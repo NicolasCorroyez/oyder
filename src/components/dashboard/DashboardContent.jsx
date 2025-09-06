@@ -30,12 +30,17 @@ const DashboardContent = ({ orders = [], onOrderClick }) => {
   // Calculer les commandes du jour
   const todayOrders = React.useMemo(() => {
     const today = new Date();
-    const todayString = today.toISOString().split("T")[0];
+    // Utiliser la date locale au lieu d'UTC pour éviter les décalages de fuseau horaire
+    const todayString =
+      today.getFullYear() +
+      "-" +
+      String(today.getMonth() + 1).padStart(2, "0") +
+      "-" +
+      String(today.getDate()).padStart(2, "0");
 
     return orders.filter((order) => {
-      const orderDate = new Date(order.pickupDate);
-      const orderDateString = orderDate.toISOString().split("T")[0];
-      return orderDateString === todayString;
+      // Les dates de pickupDate sont déjà stockées au format YYYY-MM-DD
+      return order.pickupDate === todayString;
     });
   }, [orders]);
 
@@ -147,7 +152,16 @@ const DashboardContent = ({ orders = [], onOrderClick }) => {
         onClose={closeBasketModal}
         orders={selectedBasketType?.orders || []}
         oysterType={selectedBasketType?.type}
-        selectedDate={new Date().toISOString().split("T")[0]}
+        selectedDate={(() => {
+          const today = new Date();
+          return (
+            today.getFullYear() +
+            "-" +
+            String(today.getMonth() + 1).padStart(2, "0") +
+            "-" +
+            String(today.getDate()).padStart(2, "0")
+          );
+        })()}
         onOrderClick={onOrderClick}
       />
     </div>
