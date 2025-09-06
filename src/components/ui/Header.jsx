@@ -5,14 +5,16 @@ const Header = ({ onLogout }) => {
   const { seller } = useAuth();
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200">
+    <header className="bg-white/10 backdrop-blur-md shadow-lg border-b border-white/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo et titre */}
           <div className="flex items-center">
-            <div className="text-xl lg:text-2xl mr-2 lg:mr-3">🦪</div>
-            <h1 className="text-lg lg:text-xl font-bold text-gray-900">
-              Oyder
+            <h1
+              className="text-lg lg:text-xl font-bold text-white"
+              style={{ fontFamily: "Shrikhand, cursive" }}
+            >
+              OYDER
             </h1>
           </div>
 
@@ -22,15 +24,15 @@ const Header = ({ onLogout }) => {
             <div className="flex items-center space-x-2 lg:space-x-3">
               {/* Nom du vendeur - caché sur très petit écran */}
               <div className="text-right hidden sm:block">
-                <p className="text-xs lg:text-sm font-medium text-gray-900">
+                <p className="text-xs lg:text-sm font-medium text-white">
                   {seller?.displayName}
                 </p>
-                <p className="text-xs text-gray-500">Vendeur</p>
+                <p className="text-xs text-white/70">Vendeur</p>
               </div>
 
               {/* Avatar */}
-              <div className="w-7 h-7 lg:w-8 lg:h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <span className="text-xs lg:text-sm font-medium text-blue-600">
+              <div className="w-7 h-7 lg:w-8 lg:h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/30">
+                <span className="text-xs lg:text-sm font-medium text-white">
                   {seller?.displayName?.charAt(0)?.toUpperCase()}
                 </span>
               </div>
@@ -38,7 +40,7 @@ const Header = ({ onLogout }) => {
               {/* Bouton déconnexion */}
               <button
                 onClick={onLogout}
-                className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+                className="text-white/70 hover:text-white transition-colors p-1"
                 title="Se déconnecter"
               >
                 <svg

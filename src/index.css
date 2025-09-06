@@ -1,3 +1,15 @@
+@import url("https://fonts.googleapis.com/css2?family=Shrikhand&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Background avec image gradient */
+body {
+  background-image: url("/gradient-background.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;
+}

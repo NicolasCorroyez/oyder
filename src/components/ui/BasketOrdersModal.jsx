@@ -118,7 +118,7 @@ const BasketOrdersModal = ({
                         order={order}
                         onOrderClick={onOrderClick}
                         onStatusChange={handleStatusChange}
-                        showStatusToggle={true}
+                        showStatusToggle={false}
                       />
                     ))}
                   {orders.filter((order) => order.status === "active")

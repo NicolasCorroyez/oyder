@@ -59,21 +59,24 @@ const CalendarView = ({ orders, selectedDate, onDateSelect }) => {
           <h3 className="font-semibold mb-3">
             Commandes du {selectedDate.toLocaleDateString("fr-FR")}
           </h3>
-          <div className="space-y-2">
-            {orders
-              .filter(
-                (order) =>
-                  order.pickupDate === selectedDate.toISOString().split("T")[0]
-              )
-              .map((order) => (
-                <OrderCard
-                  key={order.id}
-                  order={order}
-                  onOrderClick={() => {}} // Pas de clic sur les cartes du calendrier
-                  onStatusChange={handleStatusChange}
-                  showStatusToggle={true}
-                />
-              ))}
+          <div className="bg-white rounded-lg shadow-sm p-4 lg:p-6">
+            <div className="space-y-3">
+              {orders
+                .filter(
+                  (order) =>
+                    order.pickupDate ===
+                    selectedDate.toISOString().split("T")[0]
+                )
+                .map((order) => (
+                  <OrderCard
+                    key={order.id}
+                    order={order}
+                    onOrderClick={() => {}} // Pas de clic sur les cartes du calendrier
+                    onStatusChange={handleStatusChange}
+                    showStatusToggle={true}
+                  />
+                ))}
+            </div>
           </div>
         </div>
       )}
