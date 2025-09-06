@@ -91,15 +91,6 @@ const WeatherInfo = () => {
     return "🌤️";
   };
 
-  // Fonction pour obtenir les marées du jour (simulées)
-  const getTideInfo = () => {
-    // Simulation des marées pour Piraillan (cycle de 12h25)
-    return {
-      highTide: { time: "08:45", height: "4.8m" },
-      lowTide: { time: "14:15", height: "1.5m" },
-    };
-  };
-
   // Afficher l'erreur seulement si on n'a pas de données du tout
   if (error && !weatherData) {
     return <div className="text-sm text-red-500">{error}</div>;
@@ -115,10 +106,8 @@ const WeatherInfo = () => {
     );
   }
 
-  const tideInfo = getTideInfo();
-
   return (
-    <div className="flex flex-wrap items-center justify-center gap-3 text-sm text-white">
+    <div className="flex flex-wrap items-center justify-start gap-3 text-sm text-white">
       <div className="flex items-center space-x-1 px-2 py-1">
         <span className="text-lg">{getWeatherIcon(weatherData.condition)}</span>
         <span className="font-medium">{weatherData.temperature}°C</span>
@@ -127,13 +116,6 @@ const WeatherInfo = () => {
       <div className="flex items-center space-x-1 px-2 py-1">
         <span className="text-lg">💨</span>
         <span className="font-medium">{weatherData.windSpeed} km/h</span>
-      </div>
-
-      <div className="flex items-center space-x-1 px-2 py-1">
-        <span className="text-lg">🌊</span>
-        <span className="font-medium">
-          ↑ {tideInfo.highTide.time} ↓ {tideInfo.lowTide.time}
-        </span>
       </div>
     </div>
   );

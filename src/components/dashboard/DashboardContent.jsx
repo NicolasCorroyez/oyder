@@ -76,7 +76,7 @@ const DashboardContent = ({ orders = [], onOrderClick }) => {
       <h1 className="text-l font-bold text-white flex text-2xl justify-start mb-3">
         Bonjour {seller?.displayName || seller?.email || "Utilisateur"}
       </h1>
-      <div className="flex justify-center">
+      <div className="flex justify-start">
         <WeatherInfo />
       </div>
 
