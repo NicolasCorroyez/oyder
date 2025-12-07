@@ -6,8 +6,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        back: "#3F3F3FFF",
+        back: "#333333",
         board: "#202020FF",
+        base: "white",
+        highorange: "#FB846D",
+        highblue: "#3D62DE",
+        highlightblue: "#3D62DE",
+        normal: "#FFFFFF",
       },
     },
   },

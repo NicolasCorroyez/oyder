@@ -1,10 +1,9 @@
 import React, { useState, useMemo } from "react";
-import DayOrdersModal from "../ui/DayOrdersModal";
+import { useNavigate } from "react-router-dom";
 
 const CalendarView = ({ orders = [], onOrderClick }) => {
+  const navigate = useNavigate();
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [selectedDay, setSelectedDay] = useState(null);
-  const [isDayModalOpen, setIsDayModalOpen] = useState(false);
 
   // Grouper les commandes par date
   const ordersByDate = useMemo(() => {
@@ -21,16 +20,10 @@ const CalendarView = ({ orders = [], onOrderClick }) => {
     return grouped;
   }, [orders]);
 
-  // Ouvrir la modale d'un jour
+  // Naviguer vers la page d'un jour
   const openDayModal = (day) => {
-    setSelectedDay(day);
-    setIsDayModalOpen(true);
-  };
-
-  // Fermer la modale d'un jour
-  const closeDayModal = () => {
-    setIsDayModalOpen(false);
-    setSelectedDay(null);
+    const dateKey = formatDate(day);
+    navigate(`/day/${dateKey}`);
   };
 
   // Générer les jours du mois
@@ -215,16 +208,6 @@ const CalendarView = ({ orders = [], onOrderClick }) => {
         </p>
       </div>
 
-      {/* Modale des commandes du jour */}
-      <DayOrdersModal
-        isOpen={isDayModalOpen}
-        onClose={closeDayModal}
-        dayOrders={
-          selectedDay ? ordersByDate[formatDate(selectedDay)] || [] : []
-        }
-        selectedDate={selectedDay ? formatDate(selectedDay) : null}
-        onOrderClick={onOrderClick}
-      />
     </div>
   );
 };

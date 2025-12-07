@@ -1,35 +1,25 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import React, { useEffect, useCallback, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { useOrders } from "../../hooks/useOrders";
 import Header from "../ui/Header";
 import Navigation from "../ui/Navigation";
 import DashboardContent from "./DashboardContent";
-import CalendarView from "../views/CalendarView";
-import OverviewView from "../views/OverviewView";
-import StatsView from "../views/StatsView";
-import OrderForm from "../views/OrderForm";
-import OrderModal from "../ui/OrderModal";
+import BasketsView from "../views/BasketsView";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const { seller, signOut } = useAuth();
   const { orders, loadOrders } = useOrders();
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [viewMode, setViewMode] = useState("oyders"); // "oyders" ou "baskets"
 
-  // Fonction pour ouvrir la modale d'une commande
-  const openOrderModal = useCallback((order) => {
-    setSelectedOrder(order);
-    setIsModalOpen(true);
-  }, []);
-
-  // Fonction pour fermer la modale
-  const closeOrderModal = () => {
-    setIsModalOpen(false);
-    setSelectedOrder(null);
-  };
+  // Fonction pour naviguer vers la page de détail d'une commande
+  const openOrderModal = useCallback(
+    (order) => {
+      navigate(`/orders/${order.id}`);
+    },
+    [navigate]
+  );
 
   // Fonction pour naviguer vers l'édition d'une commande
   const handleEditOrder = (orderId) => {
@@ -61,103 +51,12 @@ const Dashboard = () => {
     };
   }, [loadOrders]);
 
-  // Gérer la redirection pour les routes de commandes individuelles
-  useEffect(() => {
-    if (
-      location.pathname.startsWith("/orders/") &&
-      location.pathname !== "/orders/new" &&
-      !location.pathname.includes("/edit")
-    ) {
-      const orderId = location.pathname.split("/")[2];
-      const order = orders.find((o) => o.id === orderId);
-
-      if (order) {
-        // Ouvrir la modale et rediriger
-        openOrderModal(order);
-        navigate("/", { replace: true });
-      } else {
-        // Commande introuvable, rediriger
-        navigate("/", { replace: true });
-      }
-    }
-  }, [location.pathname, orders, navigate, openOrderModal]);
-
   const handleLogout = async () => {
     try {
       await signOut();
       navigate("/login");
     } catch (error) {
       console.error("Erreur déconnexion:", error);
-    }
-  };
-
-  // Fonction pour afficher le bon contenu selon la route
-  const renderContent = () => {
-    // Route d'édition d'une commande
-    if (
-      location.pathname.includes("/orders/") &&
-      location.pathname.includes("/edit")
-    ) {
-      return <OrderForm />;
-    }
-
-    // Route de création d'une nouvelle commande
-    if (location.pathname === "/orders/new") {
-      return <OrderForm />;
-    }
-
-    // Routes de commandes individuelles - maintenant gérées par useEffect
-    if (
-      location.pathname.startsWith("/orders/") &&
-      location.pathname !== "/orders/new" &&
-      !location.pathname.includes("/edit")
-    ) {
-      // Retourner le contenu du dashboard pendant la redirection
-      return (
-        <DashboardContent
-          orders={orders}
-          onOrderClick={openOrderModal}
-          onEditOrder={handleEditOrder}
-        />
-      );
-    }
-
-    // Routes principales du dashboard
-    switch (location.pathname) {
-      case "/":
-        return (
-          <DashboardContent
-            orders={orders}
-            onOrderClick={openOrderModal}
-            onEditOrder={handleEditOrder}
-          />
-        );
-      case "/calendar":
-        return (
-          <CalendarView
-            orders={orders}
-            onOrderClick={openOrderModal}
-            onEditOrder={handleEditOrder}
-          />
-        );
-      case "/overview":
-        return (
-          <OverviewView
-            orders={orders}
-            onOrderClick={openOrderModal}
-            onEditOrder={handleEditOrder}
-          />
-        );
-      case "/stats":
-        return <StatsView orders={orders} />;
-      default:
-        return (
-          <DashboardContent
-            orders={orders}
-            onOrderClick={openOrderModal}
-            onEditOrder={handleEditOrder}
-          />
-        );
     }
   };
 
@@ -171,25 +70,78 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen">
-      {/* bg-gray-50 */}
       <Header seller={seller} onLogout={handleLogout} />
 
+      {/* Header de la page */}
+      <div className="flex items-center justify-center h-24 mb-4">
+        <div className="bg-highlightblue h-24 rounded-[21px] w-11/12 text-white flex items-center p-5 justify-between shadow-[0_4px_4px_rgba(0,0,0,0.25)]">
+          <div className="flex-col">
+            <p className="">Aujourd'hui</p>
+            <p className="">
+              {new Date().toLocaleDateString("fr-FR", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
+            </p>
+          </div>
+          <div className="text-3xl">
+            <p className="">
+              {(() => {
+                const todayOrders = orders.filter(
+                  (order) =>
+                    order.pickupDate === new Date().toISOString().split("T")[0]
+                );
+                const count = todayOrders.length;
+                return `${count} ${count === 1 ? "Oyder" : "Oyders"}`;
+              })()}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex gap-2 ml-5 mb-6">
+        <button
+          onClick={() => setViewMode("baskets")}
+          className={`h-2 rounded-xl w-28 flex items-center justify-center p-5 border-[0.5px] border-black ${
+            viewMode === "baskets" ? "bg-highlightblue text-white" : "bg-white"
+          }`}
+        >
+          <div className="flex-col">
+            <p className="">Paniers</p>
+          </div>
+        </button>
+        <button
+          onClick={() => setViewMode("oyders")}
+          className={`h-2 rounded-xl w-28 flex items-center justify-center p-5 ${
+            viewMode === "oyders"
+              ? "bg-highlightblue text-white"
+              : "bg-white border-[0.5px] border-black"
+          }`}
+        >
+          <div className="flex-col">
+            <p className="">Oyders</p>
+          </div>
+        </button>
+      </div>
+
+      {/* Navigation et contenu principal */}
       <div className="flex">
         <Navigation />
 
         {/* Contenu principal - responsive */}
-        <main className="flex-1 p-4 lg:p-6 w-full lg:ml-0 pb-20 lg:pb-6">
-          {renderContent()}
+        <main className="flex-1 p-2 w-full pb-20 ">
+          {viewMode === "baskets" ? (
+            <BasketsView orders={orders} onOrderClick={openOrderModal} />
+          ) : (
+            <DashboardContent
+              orders={orders}
+              onOrderClick={openOrderModal}
+              onEditOrder={handleEditOrder}
+            />
+          )}
         </main>
       </div>
-
-      {/* Modale de détail de commande */}
-      <OrderModal
-        order={selectedOrder}
-        isOpen={isModalOpen}
-        onClose={closeOrderModal}
-        onEditOrder={handleEditOrder}
-      />
     </div>
   );
 };

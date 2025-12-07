@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Shrikhand&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -6,10 +6,21 @@
 
 /* Background avec image gradient */
 body {
-  background-image: url("/gradient-background.jpg");
+  /* background-image: url("/gradient-background.jpg"); */
+  background-color: white;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
   min-height: 100vh;
+
+  /* background-color: #000000;
+  opacity: 1;
+  background-image: radial-gradient(
+    #434343 0.7000000000000001px,
+    #000000 0.7000000000000001px
+  );
+  background-size: 14px 14px; */
+
+  font-family: "Roboto", sans-serif;
 }

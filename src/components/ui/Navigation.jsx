@@ -125,31 +125,20 @@ const Navigation = () => {
   return (
     <>
       {/* Navigation mobile (barre en bas) */}
-      <nav className="lg:hidden fixed h-16 bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-lg z-50 rounded-t-3xl">
-        <div className="flex justify-between items-end py-2 px-4 pb-4 ">
+      <nav className="lg:hidden fixed h-16 bottom-0 left-0 right-0 bg-back backdrop-blur-md shadow-lg z-50">
+        <div className="flex justify-between items-end py-2 px-4 pb-4">
           {navItems.map((item) => {
             const isActive = isItemActive(item.path);
             return (
               <NavLink
                 key={item.path}
                 to={item.path}
-                className="flex flex-col items-center justify-center transition-all duration-300 ease-out w-[calc(100%/5)] min-w-0 h-10 pb-2"
+                className="flex flex-col items-center justify-center transition-all duration-300 ease-out w-[calc(100%/5)] min-w-0 h-10"
               >
                 {/* Conteneur de l'icône avec animation */}
                 <div
-                  className={`relative flex items-center justify-center transition-all duration-300 ease-out ${
-                    isActive ? "-translate-y-2" : "translate-y-0"
-                  }`}
+                  className={`relative flex items-center justify-center transition-all duration-300 ease-out`}
                 >
-                  {/* Cercle de fond pour l'onglet actif */}
-                  <div
-                    className={`absolute w-12 h-12 rounded-full transition-all duration-300 ease-out ${
-                      isActive
-                        ? "bg-blue-500 shadow-lg shadow-blue-500/30 scale-100"
-                        : "bg-transparent scale-0"
-                    }`}
-                  />
-
                   {/* Icône */}
                   <span
                     className={`relative transition-all duration-300 ease-out ${

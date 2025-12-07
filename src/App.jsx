@@ -10,6 +10,13 @@ import LoginScreen from "./components/auth/LoginScreen";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Dashboard from "./components/dashboard/Dashboard";
 import OrderForm from "./components/views/OrderForm";
+import OrderDetailPage from "./components/views/OrderDetailPage";
+import DayOrdersPage from "./components/views/DayOrdersPage";
+import BasketOrdersPage from "./components/views/BasketOrdersPage";
+import CalendarPage from "./components/views/CalendarPage";
+import OverviewPage from "./components/views/OverviewPage";
+import StatsPage from "./components/views/StatsPage";
+import BasketsPage from "./components/views/BasketsPage";
 
 function App() {
   const { isAuthenticated, loading } = useAuth();
@@ -47,7 +54,7 @@ function App() {
             path="/calendar"
             element={
               <ProtectedRoute>
-                <Dashboard />
+                <CalendarPage />
               </ProtectedRoute>
             }
           />
@@ -55,7 +62,7 @@ function App() {
             path="/overview"
             element={
               <ProtectedRoute>
-                <Dashboard />
+                <OverviewPage />
               </ProtectedRoute>
             }
           />
@@ -63,23 +70,15 @@ function App() {
             path="/stats"
             element={
               <ProtectedRoute>
-                <Dashboard />
+                <StatsPage />
               </ProtectedRoute>
             }
           />
           <Route
-            path="/orders/new"
+            path="/baskets"
             element={
               <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/orders/:id"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
+                <BasketsPage />
               </ProtectedRoute>
             }
           />
@@ -87,7 +86,39 @@ function App() {
             path="/orders/:id/edit"
             element={
               <ProtectedRoute>
-                <Dashboard />
+                <OrderForm />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/orders/new"
+            element={
+              <ProtectedRoute>
+                <OrderForm />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/orders/:id"
+            element={
+              <ProtectedRoute>
+                <OrderDetailPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/day/:date"
+            element={
+              <ProtectedRoute>
+                <DayOrdersPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/baskets/:date/:oysterType"
+            element={
+              <ProtectedRoute>
+                <BasketOrdersPage />
               </ProtectedRoute>
             }
           />

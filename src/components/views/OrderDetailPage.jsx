@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { X, Edit, Save, X as CancelIcon } from "lucide-react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Edit, Save, X as CancelIcon } from "lucide-react";
 import { useOrders } from "../../hooks/useOrders";
+import BackButton from "../ui/BackButton";
+import Navigation from "../ui/Navigation";
 import {
   isValidQuantity,
   getQuantityErrorMessage,
@@ -12,25 +15,26 @@ import {
   calculateBaskets,
 } from "../../utils/constants";
 
-const OrderModal = ({ order, isOpen, onClose, onStatusChange }) => {
-  const { updateOrder } = useOrders();
+const OrderDetailPage = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { orders, updateOrder, loadOrders } = useOrders();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({});
   const [error, setError] = useState("");
 
-  // Réinitialiser l'état d'édition quand la modale se ferme
+  // Charger les commandes si nécessaire
   useEffect(() => {
-    if (!isOpen) {
-      setIsEditing(false);
-      setFormData({});
-      setError("");
+    if (orders.length === 0) {
+      loadOrders();
     }
-  }, [isOpen]);
+  }, [orders.length, loadOrders]);
 
-  if (!isOpen || !order) return null;
+  const order = orders.find((o) => o.id === id);
 
   // Initialiser le formulaire quand on passe en mode édition
   const handleEdit = () => {
+    if (!order) return;
     // Empêcher l'édition si la commande est annulée
     if (order.status === "annulee") {
       return;
@@ -65,6 +69,7 @@ const OrderModal = ({ order, isOpen, onClose, onStatusChange }) => {
   };
 
   const handleSave = async () => {
+    if (!order) return;
     // Validation de la quantité
     if (!isValidQuantity(formData.quantity)) {
       setError(getQuantityErrorMessage(formData.quantity));
@@ -81,7 +86,7 @@ const OrderModal = ({ order, isOpen, onClose, onStatusChange }) => {
       setIsEditing(false);
       setFormData({});
       setError("");
-      onClose(); // Fermer la modale après sauvegarde
+      navigate(-1);
     } catch (error) {
       console.error("Erreur lors de la mise à jour:", error);
       setError("Erreur lors de la sauvegarde de la commande");
@@ -89,6 +94,7 @@ const OrderModal = ({ order, isOpen, onClose, onStatusChange }) => {
   };
 
   const handleCancelOrder = async () => {
+    if (!order) return;
     if (window.confirm("Êtes-vous sûr de vouloir annuler cette commande ?")) {
       try {
         await updateOrder(order.id, {
@@ -96,7 +102,7 @@ const OrderModal = ({ order, isOpen, onClose, onStatusChange }) => {
           status: "annulee",
           updatedAt: new Date().toISOString(),
         });
-        onClose(); // Fermer la modale après annulation
+        navigate(-1);
       } catch (error) {
         console.error("Erreur lors de l'annulation:", error);
         setError("Erreur lors de l'annulation de la commande");
@@ -105,6 +111,7 @@ const OrderModal = ({ order, isOpen, onClose, onStatusChange }) => {
   };
 
   const handleReactivateOrder = async () => {
+    if (!order) return;
     if (window.confirm("Êtes-vous sûr de vouloir réactiver cette commande ?")) {
       try {
         await updateOrder(order.id, {
@@ -112,11 +119,26 @@ const OrderModal = ({ order, isOpen, onClose, onStatusChange }) => {
           status: "active",
           updatedAt: new Date().toISOString(),
         });
-        onClose(); // Fermer la modale après réactivation
+        navigate(-1);
       } catch (error) {
         console.error("Erreur lors de la réactivation:", error);
         setError("Erreur lors de la réactivation de la commande");
       }
+    }
+  };
+
+  const handleStatusChange = async (newStatus) => {
+    if (!order) return;
+    try {
+      await updateOrder(order.id, {
+        ...order,
+        status: newStatus,
+        updatedAt: new Date().toISOString(),
+      });
+      navigate(-1);
+    } catch (error) {
+      console.error("Erreur lors du changement de statut:", error);
+      setError("Erreur lors du changement de statut");
     }
   };
 
@@ -150,31 +172,37 @@ const OrderModal = ({ order, isOpen, onClose, onStatusChange }) => {
     }
   };
 
+  if (!order) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-500 mb-4">Commande introuvable</p>
+          <BackButton />
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div
-      className="fixed inset-0 bg-highlightblue bg-opacity-50 flex items-center justify-center p-4 z-50"
-      onClick={onClose}
-    >
-      <div
-        className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* En-tête de la modale */}
-        <div className="p-6 border-b border-gray-200">
-          {/* En-tête avec titre et croix */}
+    <div className="min-h-screen bg-white">
+      <div className="flex">
+        <Navigation />
+        <div className="flex-1 p-2 w-full pb-20">
+          <div className="max-w-4xl mx-auto p-4 lg:p-6">
+            {/* En-tête avec bouton retour */}
+            <div className="mb-6">
+              <BackButton />
+            </div>
+
+        {/* En-tête de la page */}
+        <div className="mb-6 border-b border-gray-200 pb-4">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-gray-900">
               {isEditing ? "Modifier la commande" : "Détails de la commande"}
             </h2>
-            <button
-              onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <X size={20} />
-            </button>
           </div>
 
-          {/* Boutons d'action sous le titre */}
+          {/* Boutons d'action */}
           <div className="flex items-center space-x-3">
             {isEditing ? (
               <>
@@ -221,8 +249,8 @@ const OrderModal = ({ order, isOpen, onClose, onStatusChange }) => {
           </div>
         </div>
 
-        {/* Contenu de la modale */}
-        <div className="p-6 space-y-6">
+        {/* Contenu de la page */}
+        <div className="space-y-6">
           {/* Affichage des erreurs */}
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -481,17 +509,6 @@ const OrderModal = ({ order, isOpen, onClose, onStatusChange }) => {
             </div>
           </div>
 
-          {/* Adresse de livraison */}
-          {order.deliveryAddress && (
-            <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <span className="text-green-500 mr-2">📍</span>
-                Adresse de livraison
-              </h3>
-              <p className="text-gray-900">{order.deliveryAddress}</p>
-            </div>
-          )}
-
           {/* Notes */}
           <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
@@ -528,53 +545,47 @@ const OrderModal = ({ order, isOpen, onClose, onStatusChange }) => {
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Boutons d'action */}
-        <div className="flex justify-between items-center p-6 border-t border-gray-200 bg-gray-50">
-          <div className="flex items-center space-x-3">
-            {/* Bouton de changement de statut active/recue */}
-            {order.status !== "annulee" && onStatusChange && (
-              <button
-                onClick={() => {
-                  const newStatus =
-                    order.status === "active" ? "recue" : "active";
-                  onStatusChange(order, newStatus);
-                }}
-                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
-              >
-                <span>{order.status === "active" ? "✓" : "↺"}</span>
-                <span>
-                  {order.status === "active"
-                    ? "Marquer comme récupérée"
-                    : "Remettre en active"}
-                </span>
-              </button>
-            )}
+          {/* Boutons d'action */}
+          <div className="flex justify-between items-center p-6 border-t border-gray-200 bg-gray-50 rounded-lg">
+            <div className="flex items-center space-x-3">
+              {/* Bouton de changement de statut active/recue */}
+              {order.status !== "annulee" && (
+                <button
+                  onClick={() => {
+                    const newStatus =
+                      order.status === "active" ? "recue" : "active";
+                    handleStatusChange(newStatus);
+                  }}
+                  className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+                >
+                  <span>{order.status === "active" ? "✓" : "↺"}</span>
+                  <span>
+                    {order.status === "active"
+                      ? "Marquer comme récupérée"
+                      : "Remettre en active"}
+                  </span>
+                </button>
+              )}
 
-            {/* Bouton de réactivation pour les commandes annulées */}
-            {order.status === "annulee" && (
-              <button
-                onClick={handleReactivateOrder}
-                className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors shadow-sm"
-              >
-                <span>✅</span>
-                <span>Réactiver la commande</span>
-              </button>
-            )}
+              {/* Bouton de réactivation pour les commandes annulées */}
+              {order.status === "annulee" && (
+                <button
+                  onClick={handleReactivateOrder}
+                  className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors shadow-sm"
+                >
+                  <span>✅</span>
+                  <span>Réactiver la commande</span>
+                </button>
+              )}
+            </div>
           </div>
-
-          {/* Bouton de fermeture */}
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-gray-700 bg-white border border-gray-300 text-sm font-medium rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-colors shadow-sm"
-          >
-            Fermer
-          </button>
+        </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default OrderModal;
+export default OrderDetailPage;
+
